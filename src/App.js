@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
-import Board from './components/Board';
-import style from './style';
+import React from 'react';
+import Game from './components/Game';
 
 function App() {
   return (
-    <main className="main">
-      <Board />
+    <main style={{ margin: '50px auto', width: '400px' }}>
+      <Game />
     </main>
   );
 }

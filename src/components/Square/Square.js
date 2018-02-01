@@ -1,29 +1,38 @@
 import React from 'react';
+import styled from 'styled-components';
 
-function Square({ color, handleClick }) {
+function Square(props) {
+  const Wrapper = styled.button`
+    border: 1px solid #999;
+    float: left;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 34px;
+    height: 50px;
+    margin-right: -1px;
+    margin-top: -1px;
+    padding: 0;
+    text-align: center;
+    width: 50px;
+
+    &:focus {
+      outline: none;
+    }
+  `;
+
+  const Piece = styled.div`
+    background-color: ${props.color};
+    border-radius: 50%;
+    height: 100%;
+    width: 100%;
+  `;
+
   return (
-    <td
-      style={{
-        overflow: 'hidden',
-        width: 'auto',
-        height: '25px',
-        color: 'red',
-        borderColor: 'black',
-        border: '1px solid black',
-      }}
-      onClick={handleClick}
+    <Wrapper
+      onClick={() => props.onClick()}
     >
-      <div
-        style={{
-          color,
-          border: `1px solid ${color}`,
-          backgroundColor: color,
-          backgroundSize: '100%',
-          borderRadius: '50%',
-          height: '100%',
-        }}
-      />
-    </td>
+      <Piece />
+    </Wrapper>
   );
 }
 

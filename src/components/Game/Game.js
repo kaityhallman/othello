@@ -15,15 +15,15 @@ class Game extends Component {
     this.state = {
       squares: squares,
       blueIsNext: true, // player blue goes first!
-      stepNumber: 0, // count how many plays
+      turn: 0, // count how many plays
     };
   }
 
   handleClick = (i) => {
-    const squares = this.state.squares.slice();
+    const squares = this.state.squares;
 
     // if we have no more squares to click, exit out.
-    if (this.state.stepNumber >= 60 || squares[i])
+    if (this.state.turn >= 60 || squares[i])
       return;
 
     const convertedPiece = this.convertPiece(i);
@@ -41,51 +41,63 @@ class Game extends Component {
 
     this.setState({
       squares,
-      stepNumber: this.state.stepNumber + 1,
+      turn: this.state.turn + 1,
       blueIsNext: !this.state.blueIsNext,
     });
   }
 
   convertPiece = (i) => {
     let convertedPiece = Array(0);
-    for (let x = -1; x < 2; x++){
-      for (let y = -1; y < 2; y++){
+    for (let x = -1; x < 2; x++) {
+      for (let y = -1; y < 2; y++) {
         if (x !== 0 || y !== 0){
-          convertedPiece = convertedPiece.concat(this.createLine(i, x, y));
+          // we pass in our array index, and pass in x & y values to find the
+          // exact plot that has been clicked looking up x & y axis.
+          // we check in 8 directions.
+          convertedPiece = convertedPiece.concat(this.mapPlot(i, x, y));
         }
       }
     }
     return convertedPiece;
   }
 
-  createLine = (i, xStep, yStep) => {
-    const squares = this.state.squares.slice();
+  mapPlot = (i, xStep, yStep) => {
+    const squares = this.state.squares;
+
     let convertedPiece = [];
     let found = false;
-    const current = this.state.blueIsNext ? 'blue' : 'red';
-    let x = getX(i) + xStep, y = getY(i) + yStep;
 
+    // what color the square should be.
+    const current = this.state.blueIsNext ? 'blue' : 'red';
+
+    let x = getX(i) + xStep;
+    let y = getY(i) + yStep;
+
+    // x and y must be on the board and it can't already be 'found' or conquered!
     while (!found && x >= 0 && x < 8 && y >= 0 && y < 8) {
       if (!squares[getId(x,y)]) {
+        // if it is not the clicked upon value, return out
         return [];
       } else if (squares[getId(x,y)] === current) {
+        // if the square color matches, these spots have already been found
         found = true;
       }
       else {
+        // this square is clickable and can be converted
         convertedPiece.push(getId(x,y));
         x += xStep;
         y += yStep;
       }
     }
 
-    if (found)
+    if (found) // make the square colored!
       return convertedPiece;
     return [];
   }
 
   passTurn = () => {
     // no passes if game is over
-    if (this.state.stepNumber > 59)
+    if (this.state.turn > 59)
       return;
     // set up next turn
     this.setState({ blueIsNext: !this.state.blueIsNext });
@@ -93,10 +105,10 @@ class Game extends Component {
 
   giveUp = () => {
     // can't give up if game is over
-    if (this.state.stepNumber > 59)
+    if (this.state.turn > 59)
       return;
 
-    const squares = this.state.squares.slice();
+    const squares = this.state.squares;
     const fillWith = this.state.blueIsNext ? 'red' : 'blue';
 
     for (let i = 0; i < 64; i++)
@@ -104,7 +116,7 @@ class Game extends Component {
         // make all squares the color of the winner! mua ha ha
         squares[i] = fillWith;
 
-    this.setState({ squares: squares, stepNumber: 60 });
+    this.setState({ squares, turn: 60 });
   }
 
   render() {
